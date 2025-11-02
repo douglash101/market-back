@@ -1,0 +1,376 @@
+basePath: /
+definitions:
+  product.CategoryResponseDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/product.OptionResponseDTO'
+        type: array
+      product_id:
+        type: string
+      required:
+        type: boolean
+      status:
+        $ref: '#/definitions/product.ProductStatus'
+      updated_at:
+        type: string
+    type: object
+  product.OptionResponseDTO:
+    properties:
+      category_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  product.ProductCategoryCreateDTO:
+    properties:
+      description:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - name
+    type: object
+  product.ProductCategoryResponseDTO:
+    properties:
+      company_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  product.ProductCreateDTO:
+    properties:
+      description:
+        maxLength: 500
+        type: string
+      image_url:
+        maxLength: 180
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      price:
+        type: number
+    required:
+    - name
+    - price
+    type: object
+  product.ProductResponseDTO:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/product.CategoryResponseDTO'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      status:
+        $ref: '#/definitions/product.ProductStatus'
+      updated_at:
+        type: string
+    type: object
+  product.ProductStatus:
+    enum:
+    - active
+    - inactive
+    - deleted
+    type: string
+    x-enum-varnames:
+    - ProductStatusActive
+    - ProductStatusInactive
+    - ProductStatusDeleted
+  user.UserCreateDTO:
+    properties:
+      market:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  user.UserFoundDTO:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  user.UserLoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@market.com
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API para gerenciamento de produtos e categorias para delivery
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: market API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica um usuário no sistema
+      parameters:
+      - description: Dados de login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserLoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UserFoundDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login de usuário
+      tags:
+      - auth
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Retorna os dados do usuário atualmente autenticado
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UserFoundDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Obter dados do usuário autenticado
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova conta de usuário
+      parameters:
+      - description: Dados do usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserCreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.UserFoundDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Registrar novo usuário
+      tags:
+      - auth
+  /product-categories:
+    get:
+      consumes:
+      - application/json
+      description: Lista todas as categorias de produto da empresa
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Listar categorias de produto
+      tags:
+      - product-categories
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova categoria de produto para a empresa
+      parameters:
+      - description: Dados da categoria
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/product.ProductCategoryCreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/product.ProductCategoryResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Criar categoria de produto
+      tags:
+      - product-categories
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos os produtos da empresa
+      parameters:
+      - description: Filtrar por status
+        enum:
+        - active
+        - inactive
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Listar produtos
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo produto para a empresa
+      parameters:
+      - description: Dados do produto
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/product.ProductCreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/product.ProductResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Criar produto
+      tags:
+      - products
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
