@@ -52,7 +52,7 @@ func Load() {
 			DATABASE_SCHEMA:   getEnv("DATABASE_SCHEMA", ""),
 
 			CLOUD_ENV:          getEnv("CLOUD_ENV", "aws"),
-			CLOUD_KEY:          getEnv("CLOUD_KEY", "AKIAUALMXV557XUQV26Y"),
+			CLOUD_KEY:          getEnv("CLOUD_KEY", ""),
 			CLOUD_SECRET:       getEnv("CLOUD_SECRET", ""),
 			CLOUD_REGION:       getEnv("CLOUD_REGION", "sa-east-1"),
 			CLOUD_DISABLED_SSL: getEnvAsBool("CLOUD_DISABLED_SSL", true),
