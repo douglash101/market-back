@@ -53,7 +53,7 @@ func Load() {
 
 			CLOUD_ENV:          getEnv("CLOUD_ENV", "aws"),
 			CLOUD_KEY:          getEnv("CLOUD_KEY", "AKIAUALMXV557XUQV26Y"),
-			CLOUD_SECRET:       getEnv("CLOUD_SECRET", "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"),
+			CLOUD_SECRET:       getEnv("CLOUD_SECRET", ""),
 			CLOUD_REGION:       getEnv("CLOUD_REGION", "sa-east-1"),
 			CLOUD_DISABLED_SSL: getEnvAsBool("CLOUD_DISABLED_SSL", true),
 			CLOUD_HOST:         getEnv("CLOUD_HOST", "https://s3.sa-east-1.amazonaws.com"),
