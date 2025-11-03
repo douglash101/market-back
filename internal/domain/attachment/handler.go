@@ -6,7 +6,6 @@ import (
 	"market/pkg/cloud"
 	"market/pkg/config"
 	"market/pkg/httpx"
-	"market/pkg/security"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -40,14 +39,14 @@ func (h *Handler) UploadAttachment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Extract user info from JWT token (set by auth middleware)
-	userAuth, err := security.GetUser(r.Context())
-	if err != nil {
-		httpx.SendUnauthorized(w, "User not authenticated")
-		return
-	}
+	// userAuth, err := security.GetUser(r.Context())
+	// if err != nil {
+	// 	httpx.SendUnauthorized(w, "User not authenticated")
+	// 	return
+	// }
 
 	// Parse multipart form (max 10MB)
-	err = r.ParseMultipartForm(10 << 20)
+	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		httpx.SendBadRequest(w, "Failed to parse form")
 		return
@@ -104,7 +103,7 @@ func (h *Handler) UploadAttachment(w http.ResponseWriter, r *http.Request) {
 		Description: description,
 	}
 
-	attachment, err := h.usecase.Create(createDTO, userAuth.CompanyID)
+	attachment, err := h.usecase.Create(createDTO)
 	if err != nil {
 		httpx.SendInternalServerError(w, "Failed to create attachment", err)
 		return
@@ -135,13 +134,13 @@ func (h *Handler) GetAttachmentByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userAuth, err := security.GetUser(r.Context())
-	if err != nil {
-		httpx.SendUnauthorized(w, "User not authenticated")
-		return
-	}
+	// userAuth, err := security.GetUser(r.Context())
+	// if err != nil {
+	// 	httpx.SendUnauthorized(w, "User not authenticated")
+	// 	return
+	// }
 
-	attachment, err := h.usecase.FindByID(id, userAuth.CompanyID)
+	attachment, err := h.usecase.FindByID(id)
 	if err != nil {
 		httpx.SendInternalServerError(w, "Failed to get attachment", err)
 		return
@@ -185,13 +184,13 @@ func (h *Handler) UpdateAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userAuth, err := security.GetUser(r.Context())
-	if err != nil {
-		httpx.SendUnauthorized(w, "User not authenticated")
-		return
-	}
+	// userAuth, err := security.GetUser(r.Context())
+	// if err != nil {
+	// 	httpx.SendUnauthorized(w, "User not authenticated")
+	// 	return
+	// }
 
-	attachment, err := h.usecase.Update(id, userAuth.CompanyID, &updateDTO)
+	attachment, err := h.usecase.Update(id, &updateDTO)
 	if err != nil {
 		httpx.SendInternalServerError(w, "Failed to update attachment", err)
 		return
@@ -227,13 +226,13 @@ func (h *Handler) DeleteAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userAuth, err := security.GetUser(r.Context())
-	if err != nil {
-		httpx.SendUnauthorized(w, "User not authenticated")
-		return
-	}
+	// userAuth, err := security.GetUser(r.Context())
+	// if err != nil {
+	// 	httpx.SendUnauthorized(w, "User not authenticated")
+	// 	return
+	// }
 
-	err = h.usecase.Delete(id, userAuth.CompanyID)
+	err = h.usecase.Delete(id)
 	if err != nil {
 		httpx.SendInternalServerError(w, "Failed to delete attachment", err)
 		return

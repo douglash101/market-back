@@ -9,6 +9,7 @@ import (
 	"market/pkg/config"
 	"market/pkg/database"
 	"market/pkg/logger"
+	"market/pkg/providers/muffato"
 	"net/http"
 
 	_ "market/docs"
@@ -34,6 +35,9 @@ func main() {
 		product.NewHandler(product.NewService(log)),
 		attachment.NewHandler(attachment.NewService(log)),
 	)
+
+	muf := muffato.NewMuffatoProvider()
+	muf.FetchProducts()
 
 	log.Infof("🙏 Starting server on port %s 🙏", config.Get().SERVER_PORT)
 	err := http.ListenAndServe(

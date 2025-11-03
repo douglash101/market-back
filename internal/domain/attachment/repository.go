@@ -10,9 +10,9 @@ import (
 
 type Repository interface {
 	Create(attachment *Attachment) (*Attachment, error)
-	FindByID(id uuid.UUID, companyID uuid.UUID) (*Attachment, error)
-	Update(id uuid.UUID, companyID uuid.UUID, attachment *Attachment) (*Attachment, error)
-	Delete(id uuid.UUID, companyID uuid.UUID) error
+	FindByID(id uuid.UUID) (*Attachment, error)
+	Update(id uuid.UUID, attachment *Attachment) (*Attachment, error)
+	Delete(id uuid.UUID) error
 }
 
 type repository struct {
@@ -28,9 +28,9 @@ func NewRepository(
 	dbInstance := database.GetInstance(log)
 
 	insert := `INSERT INTO public.attachments
-		(id, company_id, url, type, description, created_at, updated_at)
+		(id, url, type, description, created_at, updated_at)
 	VALUES
-		($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);`
+		($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);`
 
 	createStatement, err := dbInstance.Prepare(insert)
 	if err != nil {
@@ -48,7 +48,6 @@ func NewRepository(
 func (o *repository) Create(attachment *Attachment) (*Attachment, error) {
 	_, err := o.createStatement.Exec(
 		attachment.ID,
-		attachment.CompanyID,
 		attachment.URL,
 		attachment.Type,
 		attachment.Description,
@@ -62,10 +61,10 @@ func (o *repository) Create(attachment *Attachment) (*Attachment, error) {
 	return attachment, nil
 }
 
-func (o *repository) FindByID(id uuid.UUID, companyID uuid.UUID) (*Attachment, error) {
-	sql := `SELECT id, company_id, url, type, description, created_at, updated_at
-	FROM attachments WHERE id = $1 and company_id = $2 LIMIT 1`
-	row, err := o.db.Query(sql, id, companyID)
+func (o *repository) FindByID(id uuid.UUID) (*Attachment, error) {
+	sql := `SELECT id, url, type, description, created_at, updated_at
+	FROM attachments WHERE id = $1 LIMIT 1`
+	row, err := o.db.Query(sql, id)
 
 	if err != nil {
 		o.log.Errorw("error on execute FindByID", "error", err)
@@ -78,7 +77,6 @@ func (o *repository) FindByID(id uuid.UUID, companyID uuid.UUID) (*Attachment, e
 	if row.Next() {
 		err = row.Scan(
 			&attachment.ID,
-			&attachment.CompanyID,
 			&attachment.URL,
 			&attachment.Type,
 			&attachment.Description,
@@ -95,22 +93,22 @@ func (o *repository) FindByID(id uuid.UUID, companyID uuid.UUID) (*Attachment, e
 	return nil, nil
 }
 
-func (o *repository) Update(id uuid.UUID, companyID uuid.UUID, attachment *Attachment) (*Attachment, error) {
+func (o *repository) Update(id uuid.UUID, attachment *Attachment) (*Attachment, error) {
 	sql := `UPDATE attachments SET 
 		url = $2, type = $3, description = $4, updated_at = CURRENT_TIMESTAMP
-		WHERE id = $1 AND company_id = $5`
+		WHERE id = $1`
 
-	_, err := o.db.Exec(sql, id, attachment.URL, attachment.Type, attachment.Description, companyID)
+	_, err := o.db.Exec(sql, id, attachment.URL, attachment.Type, attachment.Description)
 	if err != nil {
 		o.log.Errorw("error on execute Update", "error", err)
 		return nil, err
 	}
 
-	return o.FindByID(id, companyID)
+	return o.FindByID(id)
 }
 
-func (o *repository) Delete(id uuid.UUID, companyID uuid.UUID) error {
-	sql := `DELETE FROM attachments WHERE id = $1 AND company_id = $2`
+func (o *repository) Delete(id uuid.UUID) error {
+	sql := `DELETE FROM attachments WHERE id = $1`
 
 	_, err := o.db.Exec(sql, id)
 	if err != nil {

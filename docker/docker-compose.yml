@@ -11,17 +11,17 @@ services:
     ports:
       - "5432:5432"
 
-  evolution-api:
-    image: atendai/evolution-api:v2.1.1
-    container_name: evolution_api
-    restart: always
-    ports:
-      - "9999:9999"
-    env_file:
-      - ./evolution-api/.env
-    volumes:
-      - evolution_store:/evolution/store
-      - evolution_instances:/evolution/instances
+  # evolution-api:
+  #   image: atendai/evolution-api:v2.1.1
+  #   container_name: evolution_api
+  #   restart: always
+  #   ports:
+  #     - "9999:9999"
+  #   env_file:
+  #     - ./evolution-api/.env
+  #   volumes:
+  #     - evolution_store:/evolution/store
+  #     - evolution_instances:/evolution/instances
 
   redis:
     image: redis:latest

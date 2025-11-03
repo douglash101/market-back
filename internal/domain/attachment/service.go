@@ -6,10 +6,10 @@ import (
 )
 
 type UseCase interface {
-	Create(input *AttachmentCreateDTO, companyID uuid.UUID) (*AttachmentFoundDTO, error)
-	FindByID(id uuid.UUID, companyID uuid.UUID) (*AttachmentFoundDTO, error)
-	Update(id uuid.UUID, companyID uuid.UUID, input *AttachmentUpdateDTO) (*AttachmentFoundDTO, error)
-	Delete(id uuid.UUID, companyID uuid.UUID) error
+	Create(input *AttachmentCreateDTO) (*AttachmentFoundDTO, error)
+	FindByID(id uuid.UUID) (*AttachmentFoundDTO, error)
+	Update(id uuid.UUID, input *AttachmentUpdateDTO) (*AttachmentFoundDTO, error)
+	Delete(id uuid.UUID) error
 }
 
 type service struct {
@@ -26,12 +26,11 @@ func NewService(
 	}
 }
 
-func (s *service) Create(input *AttachmentCreateDTO, companyID uuid.UUID) (*AttachmentFoundDTO, error) {
+func (s *service) Create(input *AttachmentCreateDTO) (*AttachmentFoundDTO, error) {
 	attachment := NewAttachment(
 		input.URL,
 		input.Type,
 		input.Description,
-		companyID,
 	)
 
 	createdAttachment, err := s.repository.Create(attachment)
@@ -50,8 +49,8 @@ func (s *service) Create(input *AttachmentCreateDTO, companyID uuid.UUID) (*Atta
 	}, nil
 }
 
-func (s *service) FindByID(id uuid.UUID, companyID uuid.UUID) (*AttachmentFoundDTO, error) {
-	attachment, err := s.repository.FindByID(id, companyID)
+func (s *service) FindByID(id uuid.UUID) (*AttachmentFoundDTO, error) {
+	attachment, err := s.repository.FindByID(id)
 	if err != nil {
 		s.log.Errorw("error finding attachment by ID", "id", id, "error", err)
 		return nil, err
@@ -70,9 +69,9 @@ func (s *service) FindByID(id uuid.UUID, companyID uuid.UUID) (*AttachmentFoundD
 	}, nil
 }
 
-func (s *service) Update(id uuid.UUID, companyID uuid.UUID, input *AttachmentUpdateDTO) (*AttachmentFoundDTO, error) {
+func (s *service) Update(id uuid.UUID, input *AttachmentUpdateDTO) (*AttachmentFoundDTO, error) {
 	// First check if attachment exists
-	existingAttachment, err := s.repository.FindByID(id, companyID)
+	existingAttachment, err := s.repository.FindByID(id)
 	if err != nil {
 		s.log.Errorw("error finding attachment for update", "id", id, "error", err)
 		return nil, err
@@ -99,7 +98,7 @@ func (s *service) Update(id uuid.UUID, companyID uuid.UUID, input *AttachmentUpd
 		updateAttachment.Description = input.Description
 	}
 
-	updatedAttachment, err := s.repository.Update(id, companyID, updateAttachment)
+	updatedAttachment, err := s.repository.Update(id, updateAttachment)
 	if err != nil {
 		s.log.Errorw("error updating attachment", "id", id, "error", err)
 		return nil, err
@@ -115,9 +114,9 @@ func (s *service) Update(id uuid.UUID, companyID uuid.UUID, input *AttachmentUpd
 	}, nil
 }
 
-func (s *service) Delete(id uuid.UUID, companyID uuid.UUID) error {
+func (s *service) Delete(id uuid.UUID) error {
 	// Check if attachment exists
-	existingAttachment, err := s.repository.FindByID(id, companyID)
+	existingAttachment, err := s.repository.FindByID(id)
 	if err != nil {
 		s.log.Errorw("error finding attachment for deletion", "id", id, "error", err)
 		return err
@@ -127,7 +126,7 @@ func (s *service) Delete(id uuid.UUID, companyID uuid.UUID) error {
 		return nil
 	}
 
-	err = s.repository.Delete(id, companyID)
+	err = s.repository.Delete(id)
 	if err != nil {
 		s.log.Errorw("error deleting attachment", "id", id, "error", err)
 		return err

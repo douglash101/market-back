@@ -72,16 +72,13 @@ CREATE TABLE market_locations (
     UNIQUE(market_id, state_id, city_id)
 );
 
-
 CREATE TABLE attachments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id UUID,
     url VARCHAR(255) NOT NULL,
     type VARCHAR(50), -- image, document, etc.
     description VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE users (
@@ -96,8 +93,7 @@ CREATE TABLE users (
     password_reset_expires TIMESTAMP WITH TIME ZONE,
     last_login TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE categories (
@@ -117,8 +113,7 @@ CREATE TABLE products (
     unit VARCHAR(20), -- kg, unit, liter, etc.
     status VARCHAR(20) DEFAULT 'active', -- active, inactive, deleted
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE product_markets (
