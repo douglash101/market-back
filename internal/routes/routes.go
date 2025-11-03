@@ -3,6 +3,7 @@ package routes
 import (
 	"market/internal/domain/attachment"
 	"market/internal/domain/product"
+	"market/internal/domain/product_market"
 	"market/internal/domain/user"
 	"market/pkg/middleware"
 	"net/http"
@@ -18,6 +19,7 @@ func Auth(handler http.HandlerFunc) http.HandlerFunc {
 func NewRoutes(
 	userHandler *user.Handler,
 	productHandler *product.Handler,
+	productMarketHandler *product_market.Handler,
 	attachmentHandler *attachment.Handler,
 ) http.Handler {
 	mux := http.NewServeMux()
@@ -32,6 +34,10 @@ func NewRoutes(
 
 	// product routes - clean REST endpoints
 	mux.HandleFunc("GET /products/{id}", Auth(productHandler.GetProductHandler))
+
+	// product market routes
+	mux.HandleFunc("POST /product-markets", Auth(productMarketHandler.CreateProductMarketHandler))
+	mux.HandleFunc("GET /product-markets/provider/{provider_id}", Auth(productMarketHandler.GetProductMarketsByProviderIDHandler))
 
 	// attachment routes
 	mux.HandleFunc("POST /attachments", Auth(attachmentHandler.UploadAttachment))

@@ -95,6 +95,7 @@ CREATE TABLE users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX idx_users_email ON users(email);
 
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -118,6 +119,7 @@ CREATE TABLE products (
 
 CREATE TABLE product_markets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    provider_id VARCHAR(100),
     product_id UUID NOT NULL,
     market_id UUID NOT NULL,
     price NUMERIC(10,2) NOT NULL,
@@ -127,5 +129,15 @@ CREATE TABLE product_markets (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY (market_id) REFERENCES markets(id) ON DELETE CASCADE,
-    UNIQUE(product_id, market_id)
+    UNIQUE(provider_id, product_id, market_id)
 );
+CREATE INDEX idx_product_markets_product_id ON product_markets(product_id);
+CREATE INDEX idx_product_markets_market_id ON product_markets(market_id);
+CREATE INDEX idx_product_markets_provider_id ON product_markets(provider_id);
+
+INSERT INTO public.markets
+(id, "name", description, status, created_at, updated_at)
+VALUES('65dcfe06-0381-47fa-8fee-64aa45fa30b4'::uuid, 'Muffato', 'Muffato', 'active', '2025-11-02 22:18:54.834', '2025-11-02 22:18:54.834');
+INSERT INTO public.markets
+(id, "name", description, status, created_at, updated_at)
+VALUES('f7c82abd-bd7b-4bf6-a0fc-811e2d589b89'::uuid, 'Amigão', 'Amigão', 'active', '2025-11-02 22:18:54.834', '2025-11-02 22:18:54.834');

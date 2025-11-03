@@ -3,6 +3,7 @@ package main
 import (
 	"market/internal/domain/attachment"
 	"market/internal/domain/product"
+	"market/internal/domain/product_market"
 	"market/internal/domain/user"
 	"market/internal/routes"
 	"market/pkg/cloud"
@@ -33,10 +34,11 @@ func main() {
 	routeInstance := routes.NewRoutes(
 		user.NewHandler(user.NewService(log)),
 		product.NewHandler(product.NewService(log)),
+		product_market.NewHandler(product_market.NewService(log)),
 		attachment.NewHandler(attachment.NewService(log)),
 	)
 
-	muf := muffato.NewMuffatoProvider()
+	muf := muffato.NewMuffatoProvider(log)
 	muf.FetchProducts()
 
 	log.Infof("🙏 Starting server on port %s 🙏", config.Get().SERVER_PORT)

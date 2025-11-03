@@ -2,11 +2,11 @@ package muffato
 
 import (
 	"fmt"
-	"market/pkg/debug"
 	"market/pkg/request"
 	"time"
 
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 type MuffatoCategoryDump struct {
@@ -17,9 +17,12 @@ type MuffatoCategoryDump struct {
 type muffatoProvider struct {
 	FetchProductsURL     string
 	MuffatoCategoryDumps []MuffatoCategoryDump
+	log                  *zap.SugaredLogger
 }
 
-func NewMuffatoProvider() *muffatoProvider {
+func NewMuffatoProvider(
+	log *zap.SugaredLogger,
+) *muffatoProvider {
 
 	categories := []MuffatoCategoryDump{}
 	categories = append(categories,
@@ -41,6 +44,7 @@ func NewMuffatoProvider() *muffatoProvider {
 	return &muffatoProvider{
 		FetchProductsURL:     "https://www.supermuffato.com.br/api/catalog_system/pub/products/search/",
 		MuffatoCategoryDumps: categories,
+		log:                  log,
 	}
 }
 
@@ -74,8 +78,8 @@ func (p *muffatoProvider) FetchProducts() error {
 			from += 50
 			to += 50
 
-			time.Sleep(200)
-			debug.PrintStructJson(products)
+			time.Sleep(200 * time.Millisecond)
+			p.log.Debugw("Fetched products", "category", category.From, "products", len(*products))
 		}
 	}
 
